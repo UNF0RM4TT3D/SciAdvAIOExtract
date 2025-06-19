@@ -1,6 +1,6 @@
 name = "Occultic;Nine PC (Fan Port)"
 description = "# Occultic;Nine PC (Fan Port) extractor\nIf convert sprites is ticked, files marked as sprites are extracted twice, once just extracted and a second time decompilled, like the rest of the archives. This is so tools designed to use the compiled versions, like FreeMoteViewer can work."
 filetype = "psb.m"
-path = "OcculticKonosuba/windata"
+path = ""
 mkey = "detect ../OCCULTIC;NINE.exe"
 sprites = ["motion_info.psb.m"]

@@ -1,6 +1,6 @@
 name = "Occultic;Nine XB1 (via XWine1's Legacy Mode)"
 description = "# Occultic;Nine XB1 extractor\nThis is intended to be used by those who have dumped Occultic;Nine's Xbox 1 version and have XWine1.\nIf convert sprites is ticked, files marked as sprites are extracted twice, once just extracted and a second time decompilled, like the rest of the archives. This is so tools designed to use the compiled versions, like FreeMoteViewer can work."
 filetype = "psb.m"
-path = "OcculticNine_1.0.0.2_x64__mrv935vgm8cz6/Mount"
+path = ""
 mkey = "detect advengine.exe"
 sprites = ["motion_info.psb.m"]
