@@ -1,0 +1,4 @@
+name = "Steins;Gate Elite Steam"
+description = "# Extracts Steins;Gate Elite Steam version files."
+filetype = "cpk"
+path = "SG_ELITE/Data"
