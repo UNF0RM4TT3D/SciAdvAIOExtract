@@ -26,6 +26,10 @@ Non-Steam
 
 Occultic;Nine profiles written by [itsrigs](https://github.com/itsrigs)
 
+You can contribute by submitting issues and pull requests.
+
+Other 5pb or MAGES. Visual Novels may also work, the profiles just need to be written. Feel free to open issues or pull requests for those too.
+
 To extract CPK files (Chaos;Head Noah, Robotics;Notes Elite and DaSH) an extra download of [CriPakTools.exe](https://github.com/esperknight/CriPakTools) is necessary.
 
 MPV is generally able to recognise the format on even unknown video and audio files (if run from terminal). So if you want to extract A/V MPV or other software capable of detecting media formats is strongly recommended.
