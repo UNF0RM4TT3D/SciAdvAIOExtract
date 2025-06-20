@@ -4,6 +4,8 @@ This project aims to unify and simplify the process of extracting science advent
 Simply select a profile, point it to your install, select an output folder, and press go!
 Windows and Linux systems are supported. Linux requires mono or wine to use some features.
 
+You can download the latest release from the [releases](https://github.com/UNF0RM4TT3D/SciAdvAIOExtract/releases) section.
+
 ## Supported games:
 Full Steam Sci;Adv Library
 
@@ -25,8 +27,6 @@ Non-Steam
 Occultic;Nine profiles written by [itsrigs](https://github.com/itsrigs)
 
 To extract CPK files (Chaos;Head Noah, Robotics;Notes Elite and DaSH) an extra download of [CriPakTools.exe](https://github.com/esperknight/CriPakTools) is necessary.
-
-You can download the latest release from the [releases](https://github.com/UNF0RM4TT3D/SciAdvAIOExtract/releases) section.
 
 MPV is generally able to recognise the format on even unknown video and audio files (if run from terminal). So if you want to extract A/V MPV or other software capable of detecting media formats is strongly recommended.
 
