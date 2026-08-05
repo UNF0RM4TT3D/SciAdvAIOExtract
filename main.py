@@ -74,7 +74,7 @@ class Profiles:
     @property
     def path(self):
         if sys.platform == 'win32':
-            return os.path.join("C:\\Program Files (x86)\\Steam\\steamapps\\common", self.__selected["path"])
+            return os.path.normpath("C:\\Program Files (x86)\\Steam\\steamapps\\common" + self.__selected["path"])
         if sys.platform == 'linux':
             return os.path.join(os.path.expanduser("~/.steam/root/steamapps/common"), self.__selected["path"])
         print("WARNING: Running on an unsupported platform" + sys.platform + "premade paths are not supported and some extractors might not work", file=sys.stderr)
