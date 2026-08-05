@@ -6,7 +6,7 @@ Windows and Linux systems are supported. Linux requires mono or wine to use some
 
 You can download the latest release from the [releases](https://github.com/UNF0RM4TT3D/SciAdvAIOExtract/releases) section.
 
-## Supported games:
+## Supported games
 Full Steam Sci;Adv Library
 
 - Chaos;Head Noah
@@ -24,7 +24,50 @@ Non-Steam
 - Occultic;Nine Fan Port
 - Occultic;Nine Xwine port
 
-Occultic;Nine profiles written by [itsrigs](https://github.com/itsrigs)
+Occultic;Nine profiles written by [itsrigs](https://github.com/rigatoni)
+
+## Running or Building
+
+You can download the current release from the [releases section](https://github.com/UNF0RM4TT3D/SciAdvAIOExtract/releases)
+
+Then extract the zip and find the SciAdvAIOExtract executable and execute it.
+
+On Windows a terminal window will pop up behind the main window, debugging output will be output there.
+
+Linux requires Wine to be installed in $PATH (sorry SteamOS) and ideally also Mono, which speeds up execution of dotnet based dependencies greatly.
+
+## Building or running on unsupported platforms.
+
+Clone this repository or download a tagged source zip file and extract it.
+
+```
+# Create a new venv
+python -m venv venv
+
+# enter the venv
+
+source ./venv/bin/activate
+
+#on Windows use instead
+
+.\winvenv\Scripts\Activate.ps1
+
+# Install python dependencies
+pip install -r requirements.txt
+
+# Run
+
+pyside6-project run
+
+# Or build
+
+pyside6-project.exe deploy
+
+# Building on windows requires MSVC installed and any components you may get prompted to install.
+
+```
+
+---
 
 You can contribute by submitting issues and pull requests.
 
