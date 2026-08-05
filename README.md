@@ -61,7 +61,7 @@ pyside6-project run
 
 # Or build
 
-pyside6-project.exe deploy
+pyside6-project deploy
 
 # Building on windows requires MSVC installed and any components you may get prompted to install.
 
