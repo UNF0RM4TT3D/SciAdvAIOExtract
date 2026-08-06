@@ -1,3 +1,5 @@
+import pdb; pdb.set_trace() #debugger
+
 import sys, os, tomllib, threading
 from PySide6.QtWidgets import QApplication, QMainWindow, QFileDialog, QMessageBox, QDialog
 from PySide6.QtCore import Slot, QTimer
@@ -10,6 +12,7 @@ from extractor import Extractor
 class Profiles:
     def __init__(self):
         self.__getprof()
+        self.__enumsteampaths()
         self.__valid = False
         pass
 
@@ -30,6 +33,23 @@ class Profiles:
 
     def __keyerror(self, key, index):
         print("Ignoring '" + str(self._files[index]) + "', not a valid profile. Key '" + key + "' not found in profile", file=sys.stderr)
+
+    def __enumsteampaths(self): #List possible locations for game drives
+        if sys.platform == 'win32':
+            vdf = "C:\\Program Files (x86)\\Steam\\config\\libraryfolders.vdf"
+        elif sys.platform == 'linux':
+            vdf = os.path.expanduser("~/.steam/root/config/libraryfolders.vdf")
+        else:
+            print("WARNING: Running on an unsupported platform" + sys.platform + "Steam detection is not supported and some extractors might not work", file=sys.stderr)
+            self._steampaths = ['']
+            return
+        try:
+            with open(vdf) as folders:
+                self._steampaths = [ x[1].strip('"') for i in folders if (x := i.strip().split())[0].strip('"') == "path"] #List comprehension magic
+                print(f"Found steam library folders: {self._steampaths}")
+        except Exception as e:
+            print(f"Processing Steam folders failed, here's an exception: {e}\nDisabling detection")
+            self._steampaths = ['']
 
     def list(self): #lists names of profiles
         names = []
@@ -73,12 +93,14 @@ class Profiles:
 
     @property
     def path(self):
-        if sys.platform == 'win32':
-            return os.path.normpath("C:\\Program Files (x86)\\Steam\\steamapps\\common" + self.__selected["path"])
-        if sys.platform == 'linux':
-            return os.path.join(os.path.expanduser("~/.steam/root/steamapps/common"), self.__selected["path"])
-        print("WARNING: Running on an unsupported platform" + sys.platform + "premade paths are not supported and some extractors might not work", file=sys.stderr)
-        return ""
+        if "path" in self.__selected:
+            for i in self._steampaths:
+                path = os.path.normpath(i + "/steamapps/common/" + self.__selected["path"])
+                print(path, os.path.isdir(path))
+                if os.path.isdir(path):
+                    return path
+        return "Game path not found select manually"
+
 
     @property
     def sprites(self):

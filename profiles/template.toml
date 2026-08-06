@@ -4,7 +4,7 @@ name = "Template Profile"
 description = "Description"
 # Can be mpk,cpk,psb.m
 filetype = "mpk"
-# path is from steamapps/common folder (use / for folder separation leading / will result a path from root of fs) for non-steam don't specify path
+# path is from steamapps/common folder (use / for folder separation leading / will result a path from root of fs) for non-steam don't specify path variable
 path = "AC/windata"
 # the files containing (usually) sprites (can be ommited if sprites can't/shouldn't be further processed)
 sprites = ["chara.cpk", "chara_dlc.cpk"]
