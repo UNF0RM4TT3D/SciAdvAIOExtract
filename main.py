@@ -1,4 +1,4 @@
-import pdb; pdb.set_trace() #debugger
+#import pdb; pdb.set_trace() #debugger
 
 import sys, os, tomllib, threading
 from PySide6.QtWidgets import QApplication, QMainWindow, QFileDialog, QMessageBox, QDialog
@@ -8,6 +8,11 @@ from ui_mainwindow import Ui_MainWindow
 from ui_progressdialog import Ui_ProgressDialog
 
 from extractor import Extractor
+
+
+def debug(text):
+    if sys.argv[1] == "-d":
+        print(text, file=sys.stderr)
 
 class Profiles:
     def __init__(self):
@@ -36,7 +41,7 @@ class Profiles:
 
     def __enumsteampaths(self): #List possible locations for game drives
         if sys.platform == 'win32':
-            vdf = "C:\\Program Files (x86)\\Steam\\config\\libraryfolders.vdf"
+            vdf = 'C:\\Program Files (x86)\\Steam\\config\\libraryfolders.vdf'
         elif sys.platform == 'linux':
             vdf = os.path.expanduser("~/.steam/root/config/libraryfolders.vdf")
         else:
@@ -48,7 +53,7 @@ class Profiles:
                 self._steampaths = [ x[1].strip('"') for i in folders if (x := i.strip().split())[0].strip('"') == "path"] #List comprehension magic
                 print(f"Found steam library folders: {self._steampaths}")
         except Exception as e:
-            print(f"Processing Steam folders failed, here's an exception: {e}\nDisabling detection")
+            print(f"Processing Steam folders failed, here's an exception: {e}\nDisabling detection", file=sys.stderr)
             self._steampaths = ['']
 
     def list(self): #lists names of profiles
@@ -67,8 +72,8 @@ class Profiles:
             return ["No valid profiles found in profile folder"]
         return names
 
-    def select(self, index = 0): #selects and TODO: validates the profile
-        print("Selecting" + str(self._profiles[index]), file=sys.stderr)
+    def select(self, index = 0):
+        debug("Selecting" + str(self._profiles[index]))
         self.__selected = self._profiles[index]
 
     @property
@@ -258,6 +263,7 @@ class MainWindow(QMainWindow):
         progress.exec()
         t.join()
         del progress
+
 
 if __name__ == '__main__':
     os.chdir(os.path.dirname(sys.argv[0]))
