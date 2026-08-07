@@ -1,5 +1,4 @@
-#import pdb; pdb.set_trace() #debugger
-
+#!env python
 import sys, os, tomllib, threading
 from PySide6.QtWidgets import QApplication, QMainWindow, QFileDialog, QMessageBox, QDialog
 from PySide6.QtCore import Slot, QTimer
@@ -11,7 +10,7 @@ from extractor import Extractor
 
 
 def debug(text):
-    if sys.argv[1] == "-d":
+    if len(sys.argv) > 1 and sys.argv[1] == "-d":
         print(text, file=sys.stderr)
 
 class Profiles:
@@ -23,21 +22,23 @@ class Profiles:
 
     def __getprof(self): #gets available profile configs and populates _profile variable with them
         self._profiles = []
-        ignore = []
         fsdir = os.path.join(os.path.dirname(sys.argv[0]), "profiles")
         self._files = os.listdir(fsdir)
+        self._files.sort()
+        ignore = []
+        debug(self._files)
         for dex, i in enumerate(self._files):
             try:
                 with open(os.path.join(fsdir, i), "rb") as p:
                     self._profiles.append(tomllib.load(p))
-            except:
-                print("Could not open " + i, file=sys.stderr)
-                ignore.append(dex)
-        for i in ignore:
-            self._files.pop(i)
+            except Exception as e:
+                print(f"Could not open {i}: {e}", file=sys.stderr)
+                ignore.append(i)
+        self._files = [x for x in self._files if x not in ignore] 
+        debug(self._profiles)
 
     def __keyerror(self, key, index):
-        print("Ignoring '" + str(self._files[index]) + "', not a valid profile. Key '" + key + "' not found in profile", file=sys.stderr)
+        print("WARNING: '" + str(self._files[index]) + "', not a valid profile. Key '" + key + "' not found in profile", file=sys.stderr)
 
     def __enumsteampaths(self): #List possible locations for game drives
         if sys.platform == 'win32':
@@ -50,24 +51,20 @@ class Profiles:
             return
         try:
             with open(vdf) as folders:
-                self._steampaths = [ x[1].strip('"') for i in folders if (x := i.strip().split())[0].strip('"') == "path"] #List comprehension magic
-                print(f"Found steam library folders: {self._steampaths}")
+                self._steampaths = [ x[1].strip('"') for i in folders if (x := i.strip().split(maxsplit=1))[0].strip('"') == "path"] #List comprehension magic
+                debug(f"Found steam library folders: {self._steampaths}")
         except Exception as e:
-            print(f"Processing Steam folders failed, here's an exception: {e}\nDisabling detection", file=sys.stderr)
+            print(f"Processing Steam folders failed: {e}\nDisabling detection", file=sys.stderr)
             self._steampaths = ['']
 
     def list(self): #lists names of profiles
         names = []
-        ignore = []
         for dex, i in enumerate(self._profiles):
             if "name" in i.keys():
                 names.append(i["name"])
             else:
                 self.__keyerror("name", dex)
-                ignore.append(dex)
-        for i in ignore:
-            self._profiles.pop(i)
-
+                names.append(f"Invalid profile: {str(self._files[dex])}")
         if names == []:
             return ["No valid profiles found in profile folder"]
         return names
@@ -75,6 +72,9 @@ class Profiles:
     def select(self, index = 0):
         debug("Selecting" + str(self._profiles[index]))
         self.__selected = self._profiles[index]
+        if "filetype" not in self.__selected.keys():
+            self.__keyerror("filetype", index)
+            self.__selected["filetype"] = "Invalid Filetype"
 
     @property
     def name(self):
@@ -101,7 +101,6 @@ class Profiles:
         if "path" in self.__selected:
             for i in self._steampaths:
                 path = os.path.normpath(i + "/steamapps/common/" + self.__selected["path"])
-                print(path, os.path.isdir(path))
                 if os.path.isdir(path):
                     return path
         return "Game path not found select manually"
