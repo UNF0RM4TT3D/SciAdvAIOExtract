@@ -157,12 +157,16 @@ class ProgressDialog(QDialog):
             self._ui.textEdit.setMarkdown(self._ui.textEdit.toMarkdown() + "\n# FINISHED!\nYou can now close this window\n")
             self._ui.textEdit.moveCursor(self._cursor.MoveOperation.End) #Move log to end
             self._ui.textEdit.ensureCursorVisible()
+            self._ui.pushButton.setText("Close")
             self.timer.stop()
 
     @Slot()
     def on_pushButton_clicked(self):
         #with self.ext.lock:
-        self.ext.stop()
+        if self.ext.done:
+            self.close() 
+        else:
+            self.ext.stop()
 
     def closeEvent(self, event):
         if self.ext.stopped:
