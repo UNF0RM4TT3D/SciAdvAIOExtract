@@ -10,7 +10,7 @@ from extractor import Extractor
 
 
 def debug(text):
-    if len(sys.argv) > 1 and sys.argv[1] == "-d":
+    if "-d" in sys.argv:
         print(text, file=sys.stderr)
 
 class Profiles:
@@ -243,15 +243,7 @@ class MainWindow(QMainWindow):
         if not os.path.isdir(self._ui.pathLineEdit_2.text()):
             QMessageBox.critical(self, "Invalid configuration", "The selected extract location doesn't exist")
             return
-        """if not self._profile.valid:
-            QMessageBox.critical(self, "Invalid configuration", "The selected profile doesn't seem to be valid.\nCheck console output for more details.")
-            return """
         ext = Extractor(self._profile)
-        if ext.dl != "":
-            answer = QMessageBox.question(self, "Additional components needed", f"Due to licensing issues, an additional download is necessary to extract this filetype.\n{ext.dldet}\nDo you wish to continue?")
-            if answer == QMessageBox.StandardButton.No:
-                return
-            ext.download()
         if self._ui.convertCheckBox.isChecked():
             ext.convert = True
             if self._ui.keepConvCheckBox.isChecked():

@@ -8,18 +8,13 @@ class Extractor():
     def __init__(self, profile):
         self.skipextract = False
         self._profile = profile
+        self.__process = None
         self.dl = ""
         self.out = io.StringIO()
         match self._profile.filetype:
             case "mpk":
                 self._extractor = self.extract_mpk
-            case "cpk": #because of license reasons will check for and download CriPackTools.exe
-                files = os.listdir(os.path.dirname(sys.argv[0]))
-                print(files,file=sys.stderr)
-                if not "CriPakTools.exe" in files:
-                    self.dl = "https://github.com/esperknight/CriPakTools/raw/refs/heads/master/Build/CriPakTools.exe"
-                    self.dldet = "CriPakTools.exe from https://github.com/esperknight/CriPakTools/"
-                    self.dlfile = "CriPakTools.exe"
+            case "cpk": 
                 self._extractor = self.extract_cpk
             case "psb.m":
                 self._extractor = self.extract_psbm
@@ -54,7 +49,7 @@ class Extractor():
         os.remove(os.path.join(dest, arch))
 
     def extract_cpk(self, path, arch, dest):
-        exeargs = [os.path.join(os.path.dirname(sys.argv[0]), 'CriPakTools.exe'), os.path.join(path, arch), "ALL"]
+        exeargs = [os.path.abspath('CriPakTools.exe'), os.path.join(path, arch), "ALL"]
         print("Extracting " + arch)
         cwd = os.path.join(dest, arch.removesuffix(".cpk"))
         os.mkdir(cwd)
@@ -72,10 +67,10 @@ class Extractor():
         linkcopy(os.path.join(path, base + "_body.bin"), os.path.join(dest, base + "_body.bin"), False)
         if arch in self._profile.sprites and self.convert:
             print("Encountered sprite file, will be extracted twice")
-            exeargs = [os.path.join(os.path.dirname(sys.argv[0]), 'freemote', 'PsbDecompile.exe'), 'info-psb', os.path.join(dest, arch), '-k', self._profile.mkey]
+            exeargs = [os.path.abspath('freemote/PsbDecompile.exe'), 'info-psb', os.path.join(dest, arch), '-k', self._profile.mkey]
             self.runexe(exeargs, dest)
             shutil.move(os.path.join(dest, base), os.path.join(dest, base + "-psb"))
-        exeargs = [os.path.join(os.path.dirname(sys.argv[0]), 'freemote', 'PsbDecompile.exe'), 'info-psb', os.path.join(dest, arch), '-k', self._profile.mkey, '-a']
+        exeargs = [os.path.abspath('freemote/PsbDecompile.exe'), 'info-psb', os.path.join(dest, arch), '-k', self._profile.mkey, '-a']
         print("Extracting and decompiling " + arch)
         #p = subprocess.Popen(exeargs, stdout = subprocess.PIPE, stderr = subprocess.PIPE, cwd = cwd, text=True, universal_newlines=True)
         self.runexe(exeargs, dest)
@@ -154,6 +149,11 @@ class Extractor():
 
     def stop(self):
         self.stopped = True
+        sys.stderr.writeline('stopped')
+        if self.__process != None:
+            self.__process.terminate()
+            self.__process.kill()
+
 
     def download(self):
         from urllib import request
@@ -162,27 +162,30 @@ class Extractor():
                 f.write(req.read())
 
     def runexe(self, exeargs, cwd, wine=False):
+        env = dict()
         if sys.platform != 'win32':
             if wine or self.forcewine:
+                prefdir = os.path.abspath('wineprefix')
+                env['WINEPREFIX'] = prefdir
                 exeargs = [shutil.which('wine')] + exeargs
                 if self.wserv == None:
                     print("Starting wineserver, if this is the first time this might take a while. If asked to, install mono")
-                    self.wserv = subprocess.Popen([shutil.which('wineserver'), "-p5"]) #speed up multiple file processing by keeping wine running for 5 seconds after a process has exited
+                    os.makedirs(prefdir, exist_ok=True)
+                    self.wserv = subprocess.Popen([shutil.which('wineserver'), "-p5"], env=env) #speed up multiple file processing by keeping wine running for 5 seconds after a process has exited
                     while self.wserv.poll() == None:
                         pass #wait for the process to exit and daemon to start
             else:
                 exeargs = [shutil.which('mono')] + exeargs
-        p = subprocess.Popen(exeargs, stdout = subprocess.PIPE, stderr = subprocess.PIPE, cwd = cwd, text=True, universal_newlines=True)
-        while p.poll() == None:
-            self.out.write(p.stdout.readline())
-            #sys.stderr.write(p.stderr.readline()) # seems to lock up logging, don't know why when it should just be returning a blank string
+        self.__process = subprocess.Popen(exeargs, stdout = subprocess.PIPE, stderr = subprocess.PIPE, cwd = cwd, text=True, universal_newlines=True, env=env)
+        while self.__process.poll() == None:
+            self.out.write(self.__process.stdout.readline())
+            #sys.stderr.write(self.__process.stderr.readline()) # Blocking operation, too lazy to figure out not blocking
             if self.stopped:
-                p.kill()
-        if p.poll() == None:
+                        if self.__process.poll() == None:
             print("process running outside of capture loop, THIS SHOULD NEVER HAPPEN", file=sys.stderr)
-        p.wait()
-        self.out.writelines(p.stdout.readlines())
-        sys.stderr.writelines(p.stderr.readlines()) # attempt to passthrough stderr to stderr
+        self.__process.wait()
+        self.out.writelines(self.__process.stdout.readlines())
+        sys.stderr.writelines(self.__process.stderr.readlines()) # attempt to passthrough stderr to stderr
 
 def findgamekey(file):
     with open(file, "rb") as game:
@@ -205,7 +208,7 @@ def linkcopy(src, dest, symlink=True):
         os.link(src, dest)
         print("Creating a link for " + os.path.basename(src))
         return
-    except OSError: # Now how the hell did we get here?
+    except OSError: # Now how the hell did we get here? Easily, just disable symlinks and run across multiple drives
         print("Copying " + os.path.basename(src))
         shutil.copy(src, dest)
         return
