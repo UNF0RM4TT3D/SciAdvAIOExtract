@@ -1,4 +1,4 @@
-import sys, os, shutil, io, subprocess
+import sys, os, shutil, io, subprocess, threading
 import libs.mpk, libs.lay, libs.mvl_steam_CHN
 from contextlib import redirect_stdout
 
@@ -8,7 +8,6 @@ class Extractor():
     def __init__(self, profile):
         self.skipextract = False
         self._profile = profile
-        self.__process = None
         self.dl = ""
         self.out = io.StringIO()
         match self._profile.filetype:
@@ -149,11 +148,6 @@ class Extractor():
 
     def stop(self):
         self.stopped = True
-        sys.stderr.writeline('stopped')
-        if self.__process != None:
-            self.__process.terminate()
-            self.__process.kill()
-
 
     def download(self):
         from urllib import request
@@ -176,16 +170,29 @@ class Extractor():
                         pass #wait for the process to exit and daemon to start
             else:
                 exeargs = [shutil.which('mono')] + exeargs
-        self.__process = subprocess.Popen(exeargs, stdout = subprocess.PIPE, stderr = subprocess.PIPE, cwd = cwd, text=True, universal_newlines=True, env=env)
-        while self.__process.poll() == None:
-            self.out.write(self.__process.stdout.readline())
-            #sys.stderr.write(self.__process.stderr.readline()) # Blocking operation, too lazy to figure out not blocking
+        process = subprocess.Popen(exeargs, stdout = subprocess.PIPE, stderr = subprocess.PIPE, cwd = cwd, text=True, universal_newlines=True, env=env)
+        out = threading.Thread(target=self.pump, args=(process.stdout, self.out, process))
+        err = threading.Thread(target=self.pump, args=(process.stderr, sys.stderr, process))
+        out.start()
+        err.start() #non blocking stdio
+        while process.poll() == None:
+            #self.out.write(process.stdout.readline())
+            #sys.stderr.write(process.stderr.readline()) # Blocking operation, too lazy to figure out not blocking
             if self.stopped:
-                        if self.__process.poll() == None:
+                process.terminate()
+                process.kill()
+                sys.stderr.write('stopped\n')
+        if process.poll() == None:
             print("process running outside of capture loop, THIS SHOULD NEVER HAPPEN", file=sys.stderr)
-        self.__process.wait()
-        self.out.writelines(self.__process.stdout.readlines())
-        sys.stderr.writelines(self.__process.stderr.readlines()) # attempt to passthrough stderr to stderr
+        process.wait()
+        #self.out.writelines(process.stdout.readlines())
+        #sys.stderr.writelines(process.stderr.readlines()) # attempt to passthrough stderr to stderr
+
+    def pump(self, source, dest, process):
+        while process.poll() == None:
+            dest.write(source.readline())
+    
+
 
 def findgamekey(file):
     with open(file, "rb") as game:
