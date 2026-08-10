@@ -16,6 +16,10 @@
   <property name="windowTitle">
    <string>Science Adverture All In One asset extractor</string>
   </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>icon.png</normaloff>icon.png</iconset>
+  </property>
   <widget class="QWidget" name="centralwidget">
    <property name="enabled">
     <bool>true</bool>
@@ -227,7 +231,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>30</height>
+     <height>29</height>
     </rect>
    </property>
   </widget>
