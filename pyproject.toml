@@ -2,4 +2,4 @@
 name = "SciAdvAIOExtract"
 
 [tool.pyside6-project]
-files = ["main.py", "mainwindow.ui", "progressdialog.ui", "extractor.py"]
+files = ["main.py", "mainwindow.ui", "progressdialog.ui", "extractor.py", "icon.png"]
