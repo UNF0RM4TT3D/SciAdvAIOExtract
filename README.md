@@ -69,7 +69,17 @@ pyside6-project deploy
 
 ---
 
-You can contribute by submitting issues and pull requests.
+## Windows SmartScreen/Defender warnings/false positives.
+
+The application isn't signed, and may trigger SmartScreen and Defender. I do not have access to a signing certificate and nuitka/pyside-deploy is know to trigger some AV solutions. [Link](https://www.reddit.com/r/learnpython/comments/13igjrl/nuitka_hello_world_binary_detected_as_malware_why/) [Link](https://forum.qt.io/topic/161256/pyside6-deploy-triggers-windows-deffender-wacatac-b-ml)
+
+The source is available for inspection and modification, feel free to do analysis and run it from source. 
+
+## Contributing
+
+Pull requests and bug reports are very welcome. AI may be used, but needs to be disclosed.
+
+## Other details
 
 Other 5pb or MAGES. Visual Novels may also work, the profiles just need to be written. Feel free to open issues or pull requests for those too.
 
