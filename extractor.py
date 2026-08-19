@@ -131,7 +131,7 @@ class Extractor():
         self.done = True
 
     def process(self, path, archives):
-        if self._processor = None:
+        if self._processor == None:
             return
         selected = [x for x in self._profile.sprites if x in archives]
         with redirect_stdout(self.out):
