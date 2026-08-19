@@ -1,6 +1,6 @@
 name = "Anonymous;Code Steam"
 description = "# Anonymous;Code Steam version extractor\nIf convert sprites is ticked, files marked as sprites are extracted twice, once just extracted and a second time decompilled, like the rest of the archives. This is so tools designed to use the compiled versions, like FreeMoteViewer can work."
-filetype = "psb.m"
+filetype = "info.psb.m"
 path = "AC/windata"
 mkey = "detect ../game.exe"
 sprites = ["motion_info.psb.m"]

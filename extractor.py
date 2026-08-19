@@ -15,7 +15,7 @@ class Extractor():
                 self._extractor = self.extract_mpk
             case "cpk": 
                 self._extractor = self.extract_cpk
-            case "psb.m":
+            case "info.psb.m":
                 self._extractor = self.extract_psbm
             case "": #maybe should change to copy, so plain convert operations work
                 self._extractor = lambda x,y,z: print(f"Skipping extraction: {y}")
@@ -26,6 +26,8 @@ class Extractor():
                 self._processor = self.lay_process
             case "chn-mvl":
                 self._processor = self.chn_mvl_process
+            case _:
+                self._processor = None
         if sys.platform != 'win32': #create a variable to store a wineserver process object later and check if it's already running
             self.wserv = None
         if "--force-wine" in sys.argv or shutil.which('mono') == None:
@@ -129,10 +131,12 @@ class Extractor():
         self.done = True
 
     def process(self, path, archives):
+        if self._processor = None:
+            return
         selected = [x for x in self._profile.sprites if x in archives]
         with redirect_stdout(self.out):
             for spr in selected :
-                fsdir = os.path.join(path, spr.removesuffix("." + self._profile.filetype))
+                fsdir = os.path.join(path, spr.removesuffix(self._profile.filetype)[:-1])
                 files = os.listdir(fsdir)
                 files = [f for f in files if f.endswith(self._profile.pfiletype)]
                 print(f"Starting processing from {spr}")

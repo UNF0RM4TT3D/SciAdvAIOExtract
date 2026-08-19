@@ -2,7 +2,7 @@
 name = "Template Profile"
 # Description of what the profile will attempt. Multi line strings are supported with markdown formatting
 description = "Description"
-# Can be mpk,cpk,psb.m
+# Can be mpk,cpk,info.psb.m
 filetype = "mpk"
 # path is from steamapps/common folder (use / for folder separation leading / will result a path from root of fs) for non-steam don't specify path variable
 path = "AC/windata"
