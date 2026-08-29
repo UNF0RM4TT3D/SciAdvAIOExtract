@@ -153,12 +153,6 @@ class Extractor():
     def stop(self):
         self.stopped = True
 
-    def download(self):
-        from urllib import request
-        with open(self.dlfile, "wb") as f:
-            with request.urlopen(url=self.dl) as req:
-                f.write(req.read())
-
     def runexe(self, exeargs, cwd, wine=False):
         env = dict()
         if sys.platform != 'win32':
@@ -205,6 +199,10 @@ def findgamekey(file):
         if script == -1:
             return ""
         game.seek(script - 16)
+        key = game.read(16).rstrip(b"\00").decode()
+        if key != "output.log":
+            return key
+        game.seek(script - 40)
         return game.read(16).rstrip(b"\00").decode()
 
 def linkcopy(src, dest, symlink=True):
